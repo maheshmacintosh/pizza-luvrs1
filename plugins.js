@@ -1,51 +1,32 @@
 const Cookie = require('@hapi/cookie')
-const Good = require('@hapi/good')
-const Handlebars = require('handlebars')
-const Inert = require('@hapi/inert')
-const Vision = require('@hapi/vision')
+const morgan = require('morgan')
+const fs = require('fs')
+const handlebars = require('express-handlebars')
+const cookieParser = require('cookie-parser')
+const passport = require('passport')
+const Strategy = require('passport-http').DigestStrategy
 
-const GoodFile = require('./lib/good-file')
 const mockData = require('./data/mock')
+const getToppingName = require('./templates/helpers/getToppingName')
 
-const goodOptions = {
-  reporters: {
-    file: [{
-      module: '@hapi/good-squeeze',
-      name: 'Squeeze',
-      args: [{ response: '*', request: '*', error: '*' }]
-    }, {
-      module: '@hapi/good-squeeze',
-      name: 'SafeJson'
-    }, {
-      module: GoodFile,
-      args: ['./log/hapi_log']
-    }]
-  }
-}
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log', 'access.log'), { flags: 'a' })
 
-module.exports.register = async server => {
-  // register plugins
-  await server.register([
-    Inert,
-    Vision,
-    Cookie,
-    {
-      plugin: Good,
-      options: goodOptions
-    }
-  ])
+module.exports.register = async app => {
+  // register logger
+  app.use(morgan('combined', { stream: accessLogStream }))
+
+  // register cookies
+  app.use(cookieParser())
 
   // setup template rendering
-  server.views({
-    engines: {
-      hbs: Handlebars
-    },
-    layout: true,
-    relativeTo: __dirname,
-    path: './templates',
-    partialsPath: './templates/partials',
-    helpersPath: './templates/helpers'
+  const hbs = handlebars.create({
+    extname: '.hbs',
+    helpers: { getToppingName }
   })
+
+  app.set('views', './templates')
+  app.engine('handlebars', hbs.engine)
+  app.set('view engine', 'handlebars')
 
   // setup cache
   const cache = server.cache({
@@ -56,6 +37,16 @@ module.exports.register = async server => {
 
   // setup authentication/session handling
   const redirectPath = '/login'
+
+  passport.use(new Strategy({ qop: 'auth' },
+  function(username, cb) {
+    db.users.findByUsername(username, function(err, user) {
+      if (err) { return cb(err); }
+      if (!user) { return cb(null, false); }
+      return cb(null, user, user.password);
+    })
+  }))
+
 
   server.auth.strategy('session', 'cookie', {
     cookie: {

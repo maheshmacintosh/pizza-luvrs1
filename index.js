@@ -1,18 +1,17 @@
-const Hapi = require('@hapi/hapi')
+const express = require('express')
+
+const app = express()
+const port = process.env.PORT || 3000
 
 const plugins = require('./plugins')
 const routes = require('./routes')
 
 async function startServer () {
-  const server = Hapi.Server({
-    port: process.env.PORT || 3000
-  })
-
-  await plugins.register(server)
-  routes.register(server)
+  await plugins.register(app)
+  routes.register(app)
 
   try {
-    await server.start()
+    await app.listen()
     console.log(`Server running at: ${server.info.uri}`)
   } catch (err) {
     console.error(`Server could not start. Error: ${err}`)
