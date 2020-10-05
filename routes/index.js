@@ -9,18 +9,13 @@ const routes = [
   require('./pizza'),
   require('./pizza.post'),
   require('./register'),
-  require('./static'),
   require('./toppings'),
   require('./user'),
   require('./user.post')
 ]
 
-module.exports.register = server => {
-  const handledRoutes = []
-
+module.exports.register = app => {
   for (const route of routes) {
-    handledRoutes.push(route(handlers))
+    route(app, handlers)
   }
-
-  server.route(handledRoutes)
 }

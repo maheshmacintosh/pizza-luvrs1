@@ -1,10 +1,12 @@
-const Cookie = require('@hapi/cookie')
+const express = require('express')
 const morgan = require('morgan')
 const fs = require('fs')
 const handlebars = require('express-handlebars')
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
 const Strategy = require('passport-http').DigestStrategy
+const path = require('path')
+const apicache = require('apicache')
 
 const mockData = require('./data/mock')
 const getToppingName = require('./templates/helpers/getToppingName')
@@ -28,12 +30,12 @@ module.exports.register = async app => {
   app.engine('handlebars', hbs.engine)
   app.set('view engine', 'handlebars')
 
+  // setup static files
+  app.use('/assets', express.static('assets'))
+
   // setup cache
-  const cache = server.cache({
-    segment: 'sessions',
-    expiresIn: 24 * 60 * 60 * 1000
-  })
-  server.app.cache = cache
+  const cache = apicache.middleware
+  app.use(cache(`1 day`))
 
   // setup authentication/session handling
   const redirectPath = '/login'
@@ -48,27 +50,27 @@ module.exports.register = async app => {
   }))
 
 
-  server.auth.strategy('session', 'cookie', {
-    cookie: {
-      isSecure: false,
-      name: 'pzz4lyfe',
-      password: 'password-should-be-32-characters'
-    },
-    redirectTo: redirectPath,
-    appendNext: true,
-    validateFunc: async (request, session) => {
-      const cached = await cache.get(session.sid)
-      if (!cached) {
-        return { valid: false }
-      }
-      return {
-        credentials: cached.account,
-        valid: true
-      }
-    }
-  })
+  // server.auth.strategy('session', 'cookie', {
+  //   cookie: {
+  //     isSecure: false,
+  //     name: 'pzz4lyfe',
+  //     password: 'password-should-be-32-characters'
+  //   },
+  //   redirectTo: redirectPath,
+  //   appendNext: true,
+  //   validateFunc: async (request, session) => {
+  //     const cached = await cache.get(session.sid)
+  //     if (!cached) {
+  //       return { valid: false }
+  //     }
+  //     return {
+  //       credentials: cached.account,
+  //       valid: true
+  //     }
+  //   }
+  // })
 
-  server.auth.default('session')
+  // server.auth.default('session')
 
   // setup data
   mockData.hydrate()

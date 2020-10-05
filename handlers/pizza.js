@@ -1,5 +1,3 @@
-const Boom = require('@hapi/boom')
-
 const pizzaStore = require('../data/pizzas')
 const toppingsStore = require('../data/toppings')
 
@@ -15,7 +13,7 @@ async function getPizza (req, h) {
   return h.view('pizza', context)
 }
 
-async function postPizza (req) {
+async function postPizza (req, res) {
   const data = req.payload
   const name = data.name
   const toppings = data.toppings
@@ -26,7 +24,7 @@ async function postPizza (req) {
     return pizzaStore.create(name, toppings, img, username)
   } catch (err) {
     console.error(`Error on putting s3 object: ${err}`)
-    return Boom.badImplementation('Could not create pizza.')
+    res.status(500).send('Could not create pizza.')
   }
 }
 

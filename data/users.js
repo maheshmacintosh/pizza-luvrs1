@@ -1,5 +1,4 @@
 const bcrypt = require('bcryptjs')
-const Boom = require('@hapi/boom')
 
 const User = require('../models/user')
 
@@ -8,7 +7,7 @@ const saltRounds = 10
 
 async function create (username, passwordString) {
   if (users[username]) {
-    throw Boom.conflict('Username already exists')
+    throw new Error('Username already exists')
   }
 
   const passwordHash = hashPassword(passwordString)

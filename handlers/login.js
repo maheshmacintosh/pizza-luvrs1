@@ -1,5 +1,3 @@
-const Boom = require('@hapi/boom')
-
 const users = require('../data/users')
 const querystring = require('querystring')
 
@@ -10,9 +8,9 @@ module.exports = async (req, h) => {
 
   if (req.method === 'post') {
     const user = await users.authenticate(req.payload.username.toLowerCase(), req.payload.password)
-    if (!user) return Boom.unauthorized()
+    if (!user) throw new Error('Unauthorized')
     const sid = String(Math.random())
-    await req.server.app.cache.set(sid, user, 0)
+    // await req.server.app.cache.set(sid, user, 0)
     req.cookieAuth.set({ sid: sid, user: user })
     return h.redirect(getNext(req.headers.referer) || '/')
   } else if (req.method === 'get') {

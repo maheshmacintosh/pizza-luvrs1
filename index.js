@@ -1,7 +1,7 @@
 const express = require('express')
 
 const app = express()
-const port = process.env.PORT || 3000
+const port = 3000
 
 const plugins = require('./plugins')
 const routes = require('./routes')
@@ -11,8 +11,8 @@ async function startServer () {
   routes.register(app)
 
   try {
-    await app.listen()
-    console.log(`Server running at: ${server.info.uri}`)
+    await app.listen(port)
+    console.log(`Server running.`)
   } catch (err) {
     console.error(`Server could not start. Error: ${err}`)
   }

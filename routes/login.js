@@ -1,10 +1,4 @@
-module.exports = handlers => ({
-  method: 'GET',
-  path: '/login',
-  handler: handlers.login,
-  options: {
-    auth: {
-      mode: 'try'
-    }
-  }
-})
+module.exports = (app, handlers) =>
+  app.route('/login')
+    .get(handlers.login)
+    // TODO: add auth
