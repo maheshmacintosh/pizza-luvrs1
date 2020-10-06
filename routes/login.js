@@ -1,4 +1,7 @@
+const passport = require('passport')
+
 module.exports = (app, handlers) =>
-  app.route('/login')
-    .get(handlers.login)
-    // TODO: add auth
+  app.get(
+    '/login'
+    , passport.authenticate('local')
+    , handlers.login)

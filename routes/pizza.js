@@ -1,5 +1,5 @@
 module.exports = (app, handlers) =>
-  app.route('/pizza/{pizzaId}')
+  app.route('/pizza/:pizzaId')
     .get(handlers.pizza)
     // TODO: add auth
 // ({

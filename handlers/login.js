@@ -1,9 +1,9 @@
 const users = require('../data/users')
 const querystring = require('querystring')
 
-module.exports = async (req, h) => {
+module.exports = async (req, res) => {
   if (req.auth.isAuthenticated) {
-    return h.redirect('/')
+    return res.redirect('/')
   }
 
   if (req.method === 'post') {
@@ -12,9 +12,9 @@ module.exports = async (req, h) => {
     const sid = String(Math.random())
     // await req.server.app.cache.set(sid, user, 0)
     req.cookieAuth.set({ sid: sid, user: user })
-    return h.redirect(getNext(req.headers.referer) || '/')
+    return res.redirect(getNext(req.headers.referer) || '/')
   } else if (req.method === 'get') {
-    return h.view('login')
+    return res.render('login')
   }
 }
 

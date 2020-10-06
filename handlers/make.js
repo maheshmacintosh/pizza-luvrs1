@@ -1,17 +1,17 @@
 const toppingStore = require('../data/toppings')
 
-async function makePizza (req, h) {
+async function makePizza (req, res) {
   const toppings = await toppingStore.getAll()
   const context = {
     toppings: toppings,
     auth: req.auth
   }
-  return h.view('pizza.make.hbs', context)
+  return res.render('pizza.make.hbs', context)
 }
 
-module.exports = (req, h) => {
+module.exports = (req, res) => {
   switch (req.params.target) {
     case 'pizza':
-      return makePizza(req, h)
+      return makePizza(req, res)
   }
 }

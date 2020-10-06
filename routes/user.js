@@ -1,5 +1,5 @@
 module.exports = (app, handlers) =>
-  app.route('/user/{username?}')
+  app.route('/user/:username')
     .get(handlers.user)
     // TODO: add auth
 // ({

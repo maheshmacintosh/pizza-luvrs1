@@ -1,15 +1,15 @@
 const express = require('express')
 const morgan = require('morgan')
 const fs = require('fs')
-const handlebars = require('express-handlebars')
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
 const Strategy = require('passport-http').DigestStrategy
 const path = require('path')
 const apicache = require('apicache')
+const hbs = require('hbs')
 
 const mockData = require('./data/mock')
-const getToppingName = require('./templates/helpers/getToppingName')
+const getToppingName = require('./views/helpers/getToppingName')
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log', 'access.log'), { flags: 'a' })
 
@@ -21,14 +21,12 @@ module.exports.register = async app => {
   app.use(cookieParser())
 
   // setup template rendering
-  const hbs = handlebars.create({
-    extname: '.hbs',
-    helpers: { getToppingName }
-  })
+  hbs.registerHelper('getToppingName', getToppingName)
+  hbs.registerPartials(__dirname + '/views/partials')
 
-  app.set('views', './templates')
-  app.engine('handlebars', hbs.engine)
-  app.set('view engine', 'handlebars')
+  // app.set('views', './templates')
+  // app.engine('.hbs', hbs.engine)
+  app.set('view engine', 'hbs')
 
   // setup static files
   app.use('/assets', express.static('assets'))

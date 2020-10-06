@@ -1,4 +1,4 @@
-module.exports = (req, h) => {
+module.exports = (req, res) => {
   req.cookieAuth.clear()
-  return h.redirect('/')
+  return res.redirect('/')
 }

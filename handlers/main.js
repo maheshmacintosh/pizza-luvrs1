@@ -1,11 +1,11 @@
 const pizzaStore = require('../data/pizzas')
 
-module.exports = async (req, h) => {
+module.exports = async (req, res) => {
   const pizzas = await pizzaStore.getRecent()
   const context = {
     auth: req.auth,
     pizzas: pizzas
   }
 
-  return h.view('index', context)
+  return res.render('index', context)
 }

@@ -1,7 +1,7 @@
 const pizzaStore = require('../data/pizzas')
 const toppingsStore = require('../data/toppings')
 
-async function getPizza (req, h) {
+async function getPizza (req, res) {
   const toppings = await toppingsStore.getAll()
   const pizza = await pizzaStore.get(req.params.pizzaId)
   const context = {
@@ -10,7 +10,7 @@ async function getPizza (req, h) {
     toppings
   }
 
-  return h.view('pizza', context)
+  return res.render('pizza', context)
 }
 
 async function postPizza (req, res) {
@@ -28,10 +28,10 @@ async function postPizza (req, res) {
   }
 }
 
-module.exports = (req, h) => {
-  if (req.method === 'get') {
-    return getPizza(req, h)
-  } else if (req.method === 'post') {
+module.exports = (req, res) => {
+  if (req.method === 'GET') {
+    return getPizza(req, res)
+  } else if (req.method === 'POST') {
     return postPizza(req)
   }
 }

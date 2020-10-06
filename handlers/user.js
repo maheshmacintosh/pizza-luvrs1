@@ -3,15 +3,15 @@ const { get } = require('lodash')
 const userStore = require('../data/users')
 const pizzaStore = require('../data/pizzas')
 
-async function postUser (req, h) {
+async function postUser (req, res) {
   const user = await userStore.create(req.payload.username, req.payload.password)
   const sid = String(Math.random())
   // await req.server.app.cache.set(sid, user, 0)
   req.cookieAuth.set({ sid: sid, user: user })
-  return h.redirect('/login')
+  return res.redirect('/login')
 }
 
-async function getUser (req, h) {
+async function getUser (req, res) {
   const username = get(req, 'params.username') || get(req, 'auth.credentials.user.username')
   const pizzas = await pizzaStore.getForUser(username)
   const context = {
@@ -20,14 +20,14 @@ async function getUser (req, h) {
     pizzas: pizzas
   }
 
-  return h.view('user', context)
+  return res.render('user', context)
 }
 
-module.exports = (req, h) => {
-  if (req.method === 'get') {
-    return getUser(req, h)
+module.exports = (req, res) => {
+  if (req.method === 'GET') {
+    return getUser(req, res)
   }
-  if (req.method === 'post') {
-    return postUser(req, h)
+  if (req.method === 'POST') {
+    return postUser(req, res)
   }
 }
